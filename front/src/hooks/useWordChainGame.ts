@@ -1,37 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { validateWord } from '../services/wordService';
+
+const GAME_DURATION = 15;
 
 export function useWordChainGame() {
   const [words, setWords] = useState<string[]>([]);
   const [currentWord, setCurrentWord] = useState<string>('');
   const [score, setScore] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState<number>(15);
+  const [timeLeft, setTimeLeft] = useState<number>(GAME_DURATION);
   const [error, setError] = useState<string>('');
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [gameStatus, setGameStatus] = useState<'not-started' | 'playing' | 'finished'>('not-started');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const resetTimer = useCallback(() => {
+    setTimeLeft(GAME_DURATION);
+  }, []);
+
   useEffect(() => {
-    if (timeLeft <= 0 && !isGameOver) {
-      setIsGameOver(true);
+    if (gameStatus !== 'playing') return;
+
+    if (timeLeft <= 0) {
+      setGameStatus('finished');
       return;
     }
 
-    if (!isGameOver) {
-      const timer = setInterval(() => {
-        setTimeLeft((previousTime) => previousTime - 1);
-      }, 1000);
+    const timer = setInterval(() => {
+      setTimeLeft((previousTime) => previousTime - 1);
+    }, 1000);
 
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft, isGameOver]);
+    return () => clearInterval(timer);
+  }, [timeLeft, gameStatus]);
 
   useEffect(() => {
-    if (!isGameOver && !isLoading) {
+    if (gameStatus === 'playing' && !isLoading) {
       inputRef.current?.focus();
     }
-  }, [isGameOver, isLoading, words]);
+  }, [gameStatus, isLoading, words]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentWord(event.target.value);
@@ -42,7 +48,7 @@ export function useWordChainGame() {
 
     const wordToPlay = currentWord.trim().toLowerCase();
 
-    if (!wordToPlay || isLoading || isGameOver) return;
+    if (!wordToPlay || isLoading || gameStatus !== 'playing') return;
 
     if (words.includes(wordToPlay)) {
       setError('La palabra ya fue utilizada.');
@@ -68,7 +74,7 @@ export function useWordChainGame() {
       if (data.exists) {
         setWords((previousWords) => [...previousWords, wordToPlay]);
         setScore((previousScore) => previousScore + wordToPlay.length);
-        setTimeLeft(15);
+        resetTimer();
         setCurrentWord('');
       } else {
         setError('La palabra no existe en el diccionario.');
@@ -80,13 +86,18 @@ export function useWordChainGame() {
     }
   };
 
+  const startGame = () => {
+    setGameStatus('playing');
+  };
+
   const restartGame = () => {
     setWords([]);
     setScore(0);
-    setTimeLeft(15);
+    resetTimer();
     setCurrentWord('');
     setError('');
-    setIsGameOver(false);
+    setGameStatus('not-started');
+    setIsLoading(false);
   };
 
   const nextLetter = words.length > 0 ? words[words.length - 1].slice(-1).toUpperCase() : '';
@@ -98,12 +109,13 @@ export function useWordChainGame() {
     score,
     timeLeft,
     error,
-    isGameOver,
+    gameStatus,
     isLoading,
     inputRef,
     placeholder,
     handleInputChange,
     handleSubmit,
+    startGame,
     restartGame,
   };
 }

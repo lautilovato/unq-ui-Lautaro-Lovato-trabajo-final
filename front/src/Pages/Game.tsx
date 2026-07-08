@@ -1,9 +1,10 @@
 import GameErrorMessage from '../Components/GameErrorMessage';
 import GameHeader from '../Components/GameHeader';
 import GameOverScreen from '../Components/GameOverScreen';
+import PreGameScreen from '../Components/PreGameScreen';
 import WordChain from '../Components/WordChain';
 import WordInputForm from '../Components/WordInputForm';
-import {useWordChainGame} from '../hooks/useWordChainGame';
+import { useWordChainGame } from '../hooks/useWordChainGame';
 
 function Game() {
   const {
@@ -12,13 +13,14 @@ function Game() {
     score,
     timeLeft,
     error,
-    isGameOver,
+    gameStatus,
     isLoading,
     inputRef,
     placeholder,
     handleInputChange,
     handleSubmit,
     restartGame,
+    startGame,
   } = useWordChainGame();
 
   return (
@@ -26,9 +28,9 @@ function Game() {
       <div className="absolute inset-0 bg-primary/65"></div>
 
       <div className="relative z-10 w-full max-w-2xl bg-primary border-2 border-white p-6 sm:p-10 flex flex-col items-center shadow-2xl">
-        <GameHeader score={score} timeLeft={timeLeft} />
+        {gameStatus !== 'not-started' && <GameHeader score={score} timeLeft={timeLeft} />}
 
-        {!isGameOver ? (
+        {gameStatus === 'playing' && (
           <div className="w-full flex flex-col gap-6">
             <WordChain words={words} />
             <WordInputForm
@@ -41,9 +43,11 @@ function Game() {
             />
             <GameErrorMessage error={error} />
           </div>
-        ) : (
-          <GameOverScreen score={score} wordsCount={words.length} onRestart={restartGame} />
         )}
+
+        {gameStatus === 'not-started' && <PreGameScreen onStart={startGame} />}
+
+        {gameStatus === 'finished' && <GameOverScreen score={score} wordsCount={words.length} onRestart={restartGame} />}
       </div>
     </div>
   );
