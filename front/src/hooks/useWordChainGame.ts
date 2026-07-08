@@ -9,8 +9,9 @@ export function useWordChainGame() {
   const [score, setScore] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<number>(GAME_DURATION);
   const [error, setError] = useState<string>('');
-  const [gameStatus, setGameStatus] = useState<'not-started' | 'playing' | 'finished'>('not-started');
+  const [gameStatus, setGameStatus] = useState<'playing' | 'finished'>('playing');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -19,7 +20,7 @@ export function useWordChainGame() {
   }, []);
 
   useEffect(() => {
-    if (gameStatus !== 'playing') return;
+    if (gameStatus !== 'playing' || !isTimerActive) return;
 
     if (timeLeft <= 0) {
       setGameStatus('finished');
@@ -31,7 +32,7 @@ export function useWordChainGame() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, gameStatus]);
+  }, [timeLeft, gameStatus, isTimerActive]);
 
   useEffect(() => {
     if (gameStatus === 'playing' && !isLoading) {
@@ -72,6 +73,10 @@ export function useWordChainGame() {
       const data = await validateWord(wordToPlay);
 
       if (data.exists) {
+        if (words.length === 0) {
+          setIsTimerActive(true);
+        }
+
         setWords((previousWords) => [...previousWords, wordToPlay]);
         setScore((previousScore) => previousScore + wordToPlay.length);
         resetTimer();
@@ -86,17 +91,14 @@ export function useWordChainGame() {
     }
   };
 
-  const startGame = () => {
-    setGameStatus('playing');
-  };
-
   const restartGame = () => {
     setWords([]);
     setScore(0);
     resetTimer();
     setCurrentWord('');
     setError('');
-    setGameStatus('not-started');
+    setGameStatus('playing');
+    setIsTimerActive(false);
     setIsLoading(false);
   };
 
@@ -115,7 +117,6 @@ export function useWordChainGame() {
     placeholder,
     handleInputChange,
     handleSubmit,
-    startGame,
     restartGame,
   };
 }
