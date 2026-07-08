@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 function Home() {
+  const navigate = useNavigate();
+
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center p-4 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat bg-fixed"> 
       
@@ -20,7 +24,10 @@ function Home() {
         {/* ACTIONS BUTTONS */}
         <div className="w-full flex flex-col gap-5">
           
-          <button className="w-full bg-transparent hover:bg-accent text-accent hover:text-primary font-bold py-3 px-6 border-2 border-accent transition-all tracking-widest uppercase shadow-lg">
+          <button 
+            onClick={() => navigate('/game')}
+            className="w-full bg-transparent hover:bg-accent text-accent hover:text-primary font-bold py-3 px-6 border-2 border-accent transition-all tracking-widest uppercase shadow-lg"
+          >
             Jugar
           </button>
           
