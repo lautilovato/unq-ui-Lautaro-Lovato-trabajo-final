@@ -1,7 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import HowToPlayModal from '../Components/HowToPlayModal';
 
 function Home() {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center p-4 bg-[url('/background.png')] bg-cover bg-center bg-no-repeat bg-fixed"> 
@@ -36,11 +39,18 @@ function Home() {
           </button>
         </div>
 
-        <button className="mt-8 text-xs text-white/70 hover:text-accent transition-colors tracking-widest uppercase underline underline-offset-4">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mt-8 text-xs text-white/70 hover:text-accent transition-colors tracking-widest uppercase underline underline-offset-4"
+        >
           ¿Cómo se juega?
         </button>
-
       </div>
+
+      <HowToPlayModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   )
 }

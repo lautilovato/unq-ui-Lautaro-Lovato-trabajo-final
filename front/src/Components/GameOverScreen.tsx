@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 interface GameOverScreenProps {
   score: number;
   wordsCount: number;
@@ -5,6 +7,8 @@ interface GameOverScreenProps {
 }
 
 function GameOverScreen({ score, wordsCount, onRestart }: GameOverScreenProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="w-full flex flex-col items-center py-8 gap-6 animate-fade-in">
       <h2 className="text-3xl font-extrabold text-white tracking-widest uppercase">¡Tiempo agotado!</h2>
@@ -15,12 +19,20 @@ function GameOverScreen({ score, wordsCount, onRestart }: GameOverScreenProps) {
         <span className="text-white/60 text-sm mt-2">Palabras encadenadas: {wordsCount}</span>
       </div>
 
-      <button
-        onClick={onRestart}
-        className="w-full mt-4 bg-accent text-primary font-bold py-3 px-6 border-2 border-accent hover:bg-transparent hover:text-accent transition-all tracking-widest uppercase shadow-lg"
-      >
-        Jugar de nuevo
-      </button>
+      <div className="w-full flex flex-col gap-4 mt-4">
+        <button
+          onClick={onRestart}
+          className="w-full bg-accent text-primary font-bold py-3 px-6 border-2 border-accent hover:bg-transparent hover:text-accent transition-all tracking-widest uppercase shadow-lg"
+        >
+          Jugar de nuevo
+        </button>
+        <button
+          onClick={() => navigate('/')}
+          className="w-full bg-transparent text-white font-bold py-3 px-6 border-2 border-white hover:bg-white hover:text-primary transition-all tracking-widest uppercase"
+        >
+          Volver al Inicio
+        </button>
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import GameHeader from '../Components/GameHeader';
 import GameOverScreen from '../Components/GameOverScreen';
 import WordChain from '../Components/WordChain';
 import WordInputForm from '../Components/WordInputForm';
-import {useWordChainGame} from '../hooks/useWordChainGame';
+import { useWordChainGame } from '../hooks/useWordChainGame';
 
 function Game() {
   const {
@@ -12,7 +12,7 @@ function Game() {
     score,
     timeLeft,
     error,
-    isGameOver,
+    gameStatus,
     isLoading,
     inputRef,
     placeholder,
@@ -26,21 +26,23 @@ function Game() {
       <div className="absolute inset-0 bg-primary/65"></div>
 
       <div className="relative z-10 w-full max-w-2xl bg-primary border-2 border-white p-6 sm:p-10 flex flex-col items-center shadow-2xl">
-        <GameHeader score={score} timeLeft={timeLeft} />
+        {gameStatus !== 'finished' ? (
+          <>
+            <GameHeader score={score} timeLeft={timeLeft} />
 
-        {!isGameOver ? (
-          <div className="w-full flex flex-col gap-6">
-            <WordChain words={words} />
-            <WordInputForm
-              currentWord={currentWord}
-              placeholder={placeholder}
-              isLoading={isLoading}
-              inputRef={inputRef as React.RefObject<HTMLInputElement>}
-              onSubmit={handleSubmit}
-              onChange={handleInputChange}
-            />
-            <GameErrorMessage error={error} />
-          </div>
+            <div className="w-full flex flex-col gap-6">
+              <WordChain words={words} />
+              <WordInputForm
+                currentWord={currentWord}
+                placeholder={placeholder}
+                isLoading={isLoading || gameStatus !== 'playing'}
+                inputRef={inputRef as React.RefObject<HTMLInputElement>}
+                onSubmit={handleSubmit}
+                onChange={handleInputChange}
+              />
+              <GameErrorMessage error={error} />
+            </div>
+          </>
         ) : (
           <GameOverScreen score={score} wordsCount={words.length} onRestart={restartGame} />
         )}
