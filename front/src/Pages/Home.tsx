@@ -34,7 +34,10 @@ function Home() {
             Jugar
           </button>
           
-          <button className="w-full bg-transparent hover:bg-white text-white hover:text-primary font-bold py-3 px-6 border-2 border-white transition-all tracking-widest uppercase">
+          <button 
+            onClick={() => navigate('/leaderboard')}
+            className="w-full bg-transparent hover:bg-white text-white hover:text-primary font-bold py-3 px-6 border-2 border-white transition-all tracking-widest uppercase"
+          >
             Leaderboard
           </button>
         </div>
